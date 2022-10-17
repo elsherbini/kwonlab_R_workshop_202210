@@ -10,14 +10,14 @@ today’s session, you should know how to :
 -   Make quick summaries of dataframes
 -   Create new columns in dataframes
 
-### 0. Download today’s materials
+### 1. Download today’s materials
 
-\*\* Do This: \*\*  
-- Go to <https://github.com/elsherbini/kwonlab_R_workshop_20221017> -
-Click on the green “Code” button and “Download Zip” - Move the zip file
-somewhere sensible and unzip it
+**Do This:**  
+- Go to <https://github.com/elsherbini/kwonlab_R_workshop_20221017>  
+- Click on the green “Code” button and “Download Zip”  
+- Move the zip file somewhere sensible and unzip it
 
-### 1. What is R and Rstudio?
+### 2. What is R and Rstudio?
 
 R is a programming language, which means you can write programs as text
 that adheres to a syntax and R will interpret your program into
@@ -31,7 +31,7 @@ powerful and less confusing for working with data.
 
 #### changing options
 
-\*\* Do This: \*\*  
+**Do This:**  
 - Open up RStudio - Got to Tools -&gt; Global Options . - Under
 Workspace, uncheck “Restore .RData into workspace on startup” - Change
 “Save workspace to .RData on exit” to “Never” - Switch to the Appearance
@@ -42,22 +42,22 @@ and Tomorrow Night 80s. Pick any theme you want and git “Apply”
 
 #### getting to know Rstudio
 
-### 2. Create an Rproject
+### 3. Create an Rproject
 
 Rprojects make it easy to switch between different tasks. You should
 always be using an Rproject when you are using Rstudio. Create one for
 this workshop:
 
-\*\* Do This: \*\* - Make sure you’ve downloaded and extracted the repo
-(step 0 above) - File -&gt; New Project - chose “Existing Directory” -
-pick that folder.
+**Do This:** - Make sure you’ve downloaded and extracted the repo (step
+0 above) - File -&gt; New Project - chose “Existing Directory” - pick
+that folder.
 
 ### R markdown documents
 
-Create a new R markdown document \*\* Do This: \*\* - File -&gt; New
-File -&gt; R Markdown - Make the title something sensible - got to File
--&gt; Save and name it something sensible - note: file names should be
-all lower case and use `_` to separate words.
+Create a new R markdown document **Do This:** - File -&gt; New File
+-&gt; R Markdown - Make the title something sensible - got to File -&gt;
+Save and name it something sensible - note: file names should be all
+lower case and use `_` to separate words.
 
 Insert a code chunk: Code -&gt; Insert Chunk
 
