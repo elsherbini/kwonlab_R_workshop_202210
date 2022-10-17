@@ -250,21 +250,15 @@ fresh_metadata %>%
 
 ### add new columns with `dplyr::mutate()`
 
-\`\`\`{r}
-
-# sort rows based on numeric values in a column
-
-# defaults to ascending (low to high). Use `desc()` around the column name to sort high to low.
-
-fresh\_metadata %&gt;% mutate(total\_lacto =
-amplicon\_pct\_lacto\_non\_iners + amplicon\_pct\_lacto\_iners)
+<pre class="r">
+<code class="language-r">
+```{r}
+fresh_metadata %>%
+  mutate(total_lacto = amplicon_pct_lacto_non_iners + amplicon_pct_lacto_iners)
 
 # making a column that estimates how many total lacto reads there are
-
-# by multiplying total\_lacto by amplicon\_total\_reads
-
-\`\`\`</code>
-</pre>
+# by multiplying total_lacto by amplicon_total_reads
+```</code></pre>
 
 ### calculate summaries with `dplyr::summarize()` and `dplyr::group_by()`
 
@@ -272,26 +266,29 @@ Summarising a table means taking all the rows and collapsing it to one
 row. You do this with functions that take any number of values and
 return just one value, like `mean` or `average`
 
-\`\`\`{r}
+<pre class="r">
+<code class="language-r">
+```{r}
 
-fresh\_metadata %&gt;% summarise(mean\_non\_iners =
-mean(amplicon\_pct\_lacto\_non\_iners))
+fresh_metadata %>%
+  summarise(mean_non_iners = mean(amplicon_pct_lacto_non_iners))
 
 # try getting the mean of just the rows with a CT1 microbial community
 
-\`\`\`</code>
-</pre>
+
+```</code></pre>
 
 group by splits your table up by unique values in one or more columns
 
-\`\`\`{r}
+<pre class="r">
+<code class="language-r">
+```{r}
 
-fresh\_metadata %&gt;% group\_by(amplicon\_ct\_assignment) %&gt;%
-summarise(mean\_non\_iners = mean(amplicon\_pct\_lacto\_non\_iners))
+fresh_metadata %>%
+  group_by(amplicon_ct_assignment) %>%
+  summarise(mean_non_iners = mean(amplicon_pct_lacto_non_iners))
 
-# use the `n()` function inside summarise to see how many
-
+# use the `n()` function inside summarise to see how many 
 # records you have with each CT
 
-\`\`\`</code>
-</pre>
+```</code></pre>
