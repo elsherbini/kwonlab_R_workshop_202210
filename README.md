@@ -65,8 +65,8 @@ You can resize the panes using by dragging in the interstitial space.
 
 Try using the console as a calculator.
 
-Use R to calculate what percentage of your life you have spent in higher
-education
+**Do This:** Use R to calculate what percentage of your life you have
+spent in higher education as a student or trainee?
 
 ### 3. Create an Rproject
 
@@ -80,20 +80,56 @@ that folder.
 
 ### R markdown documents
 
+R markdown documents should be your default way of writing R. It allows
+you to organize your code into “chunks” and to write plain prose outside
+of chunks to document what you are doing.
+
 Create a new R markdown document **Do This:** - File -&gt; New File
 -&gt; R Markdown - Make the title something sensible - got to File -&gt;
 Save and name it something sensible - note: file names should be all
 lower case and use `_` to separate words.
 
-Insert a code chunk: Code -&gt; Insert Chunk
+Insert a code chunk: - Code -&gt; Insert Chunk - inside your code chunk,
+write the expression you used above to calculate the percentage of your
+life in higher ed - press the green play button to run the chunk - edit
+the code chunk to save this as a variable - make it so your code chunk
+prints the value of the variable when you run it
+
+<pre class="r">
+<code class="language-r">
+```{r}
+percent_life_in_higher_ed <- # your code here
+
+```</code></pre>
+
+Knit your document: - At the top of this document is a button called
+“Knit” - Press the button - Click “Open in Browser” when your document
+knits.
 
 #### style guide
 
+Variables should always be all lower case and have underscores between
+words. Being consistent will save you tons of time, and this make
+variables very readable.
+
+**Do This:**
+
 ### variables and types
+
+So far everyting we’ve worked with were numeric values. R has many other
+types of data it knows about.
+
+-   `character` values are text. This type is also called `string` in
+    other languages.
+
+-   
 
 ### How to read in data
 
-#### `here()`
+R shines for tabular data. The easiest format to store and read data
+into R is `csv` format, which stands for “comma separated values.”
+(`tsv`, or “tab separated values” is also great). You can save
+individual sheets as a csv in Excel or Google Sheets.
 
 ### `dplyr::filter()`, `dplyr::select()`, `dplyr::arrange()`
 
