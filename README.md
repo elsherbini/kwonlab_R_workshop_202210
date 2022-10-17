@@ -42,6 +42,32 @@ and Tomorrow Night 80s. Pick any theme you want and git “Apply”
 
 #### getting to know Rstudio
 
+Notice the default panes:
+
+-   Console (entire left)
+-   Environment/History (tabbed in upper right)
+-   Files/Plots/Packages/Help (tabbed in lower right)
+
+An important first question: where are we?
+
+If you have opened RStudio for the first time, you’ll be in your Home
+directory. This is noted by the ~/ at the top of the console. You can
+see too that the Files pane in the lower right shows what is in the Home
+directory where you are. You can navigate around within that Files pane
+and explore, but note that you won’t change where you are: even as you
+click through you’ll still be Home: ~/.
+
+![rstudio layout](/static_images/RStudio_IDE_homedir.png)
+
+You can resize the panes using by dragging in the interstitial space.
+
+**Do This:**
+
+Try using the console as a calculator.
+
+Use R to calculate what percentage of your life you have spent in higher
+education
+
 ### 3. Create an Rproject
 
 Rprojects make it easy to switch between different tasks. You should
