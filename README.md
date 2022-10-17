@@ -278,7 +278,8 @@ fresh_metadata %>%
 
 ```</code></pre>
 
-group by splits your table up by unique values in one or more columns
+`group_by()` splits your table up by unique values in one or more
+columns
 
 <pre class="r">
 <code class="language-r">
