@@ -67,8 +67,27 @@ Try using the console as a calculator.
 
 <pre class="r">
 <code class="language-r">
-```{r}
+```{r eval=FALSE}
+10 + 4 # you can add 
+10 - 4 # subtract
+4 / 2 # divide
+2 * 5 # multiply
+3 ^ 4 # and exponentiate
 
+# save this to a varialble
+
+x <- 3 ^ 4
+
+#to get the value of a variable, just write it and press enter
+
+x
+
+# you can build up larger expressions too
+# remember PEMDAS!
+
+y <- (3 + 4) * 7 + 3
+y
+```
 ```</code></pre>
 
 **Do This:** Use R to calculate what percentage of your life you have
