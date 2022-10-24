@@ -87,7 +87,6 @@ x
 
 y <- (3 + 4) * 7 + 3
 y
-```
 ```</code></pre>
 
 **Do This:** Use R to calculate what percentage of your life you have
