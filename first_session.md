@@ -1,3 +1,5 @@
+*This is the first session's notes. If you want the second session, go back to [https://github.com/elsherbini/kwonlab_R_workshop_20221017]*
+
 ## Intro to R and R studio
 
 Today we’re going to get started with R and Rstudio. By the end of
