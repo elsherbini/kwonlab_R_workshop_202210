@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Data Visualization and Data Wrangling in R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Joseph Elsherbini, remixed from Claus O. Wilke’s excellent SDS375 course" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="Wilke-slides-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, title-slide
+
+.title[
+# Data Visualization and Data Wrangling in R
+]
+.author[
+### Joseph Elsherbini, remixed from Claus O. Wilke’s excellent SDS375 course
+]
+.date[
+### last updated: 2022-10-24
+]
+
+---
+
+
+
+
+
+## Elementary data manipulations
+
+.pull-left[
+Last time:
+
+- Read data: `read_csv()`
+- Pick rows: `filter()`
+- Pick columns: `select()`
+- Sort rows: `arrange()`
+- Make new columns: `mutate()`
+]
+
+---
+
+## Elementary data manipulations
+
+.pull-left[
+Last time:
+
+- Read data: `read_csv()`
+- Pick rows: `filter()`
+- Pick columns: `select()`
+- Sort rows: `arrange()`
+- Make new columns: `mutate()`
+]
+
+.pull-right[
+Next:
+
+- Analyze subsets:&lt;br&gt;`group_by()` and `summarize()`
+]
+
+---
+
+## Elementary data manipulations
+
+.pull-left[
+Last time:
+
+- Read data: `read_csv()`
+- Pick rows: `filter()`
+- Pick columns: `select()`
+- Sort rows: `arrange()`
+- Make new columns: `mutate()`
+]
+
+.pull-right[
+Next:
+
+- Analyze subsets:&lt;br&gt;`group_by()` and `summarize()`
+- Reshape:&lt;br&gt;`pivot_wider()`, `pivot_longer()`
+]
+
+---
+
+## Elementary data manipulations
+
+.pull-left[
+Last time:
+
+- Read data: `read_csv()`
+- Pick rows: `filter()`
+- Pick columns: `select()`
+- Sort rows: `arrange()`
+- Make new columns: `mutate()`
+]
+
+.pull-right[
+Next:
+
+- Analyze subsets:&lt;br&gt;`group_by()` and `summarize()`
+- Reshape:&lt;br&gt;`pivot_wider()`, `pivot_longer()`
+- Combine datasets:&lt;br&gt;`left_join()`, `inner_join()`, `...`
+]
+
+---
+
+
+## Elementary data manipulations
+
+.pull-left[
+Last time:
+
+- Read data: `read_csv()`
+- Pick rows: `filter()`
+- Pick columns: `select()`
+- Sort rows: `arrange()`
+- Make new columns: `mutate()`
+]
+
+.pull-right[
+Next:
+
+- Analyze subsets:&lt;br&gt;`group_by()` and `summarize()`
+- Reshape:&lt;br&gt;`pivot_wider()`, `pivot_longer()`
+- Combine datasets:&lt;br&gt;`left_join()`, `inner_join()`, `...`
+- *Bonus* working with missing values: `is.na()`, `replace_na()`, `...`
+]
+
+---
+
+## Analyze subsets: `group_by()` and `summarize()`
+
+&lt;br&gt;
+
+.center[
+&lt;img src = "data-wrangling-2_files/summarize.svg", width = 90%&gt;&lt;/img&gt;
+]
+
+---
+
+## Example application of grouping: Counting
+
+Let's go back to the raw data:
+
+.tiny-font[
+
+
+```r
+fresh_metadata &lt;- read_csv("../data/csvs/fresh_subset_workshop_20221017.csv")
+
+fresh_metadata
+```
+
+```
+# A tibble: 1,405 × 32
+   study_id   visit…¹ ampli…² ampli…³ ampli…⁴ ampli…⁵ ampli…⁶ date_col…⁷ nugen…⁸
+   &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;date&gt;       &lt;dbl&gt;
+ 1 127-33-01… 1-024-5 CT2     2.92e-3 0.992   5.08e-4  141595 2013-09-20      NA
+ 2 127-33-01… 1-026-0 CT2     4.69e-4 0.998   8.38e-4   89485 2013-08-26      NA
+ 3 127-33-00… 1-012-0 CT1     9.91e-1 0.00755 5.88e-4   79982 2013-02-18       0
+ 4 127-33-00… 1-011-5 CT2     2.37e-2 0.973   1.55e-3   76645 NA              NA
+ 5 127-33-01… 1-025-0 CT1     9.72e-1 0       7.60e-3   55934 2013-08-19      NA
+ 6 127-33-03… 1-013-0 CT2     1.34e-1 0.784   8.02e-2   62656 2013-09-03       0
+ 7 127-33-02… 1-011-5 CT1     5.57e-1 0.437   3.25e-3   74496 2013-08-23       0
+ 8 127-33-01… 1-024-0 CT3     2.77e-2 0.105   6.15e-1   57430 2013-09-17       0
+ 9 127-33-00… 1-012-5 CT4     1.39e-2 0.00886 1.87e-1   69615 2013-04-26       3
+10 127-33-02… 1-011-0 CT3     1.79e-3 0.457   5.34e-1   51453 2013-08-20       0
+# … with 1,395 more rows, 23 more variables: nugent_mobiluncus &lt;dbl&gt;,
+#   nugent_lactobacillus &lt;dbl&gt;, nugent_total_score &lt;dbl&gt;,
+#   nugent_interpretation &lt;chr&gt;, sti_mycoplasma_genitalium_pcr &lt;chr&gt;,
+#   sti_trichomonas_vaginalis_pcr &lt;chr&gt;, sti_neisseria_gonorrhoeae_pcr &lt;chr&gt;,
+#   sti_chlamydia_trachomatis_pcr &lt;chr&gt;, bloodcount_cd8_cellsperul &lt;dbl&gt;,
+#   bloodcount_cd8_percent &lt;dbl&gt;, bloodcount_cd4_cellsperul &lt;dbl&gt;,
+#   bloodcount_cd4_percent &lt;dbl&gt;, bloodcount_cd45_cellsperul &lt;dbl&gt;, …
+# ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+```
+]
+
+---
+
+## Example application of grouping: Counting
+
+Let's group it:
+
+.tiny-font[
+
+
+```r
+fresh_metadata %&gt;%
+  group_by(amplicon_ct_assignment)
+```
+
+```
+# A tibble: 1,405 × 32
+# Groups:   amplicon_ct_assignment [4]
+   study_id   visit…¹ ampli…² ampli…³ ampli…⁴ ampli…⁵ ampli…⁶ date_col…⁷ nugen…⁸
+   &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;date&gt;       &lt;dbl&gt;
+ 1 127-33-01… 1-024-5 CT2     2.92e-3 0.992   5.08e-4  141595 2013-09-20      NA
+ 2 127-33-01… 1-026-0 CT2     4.69e-4 0.998   8.38e-4   89485 2013-08-26      NA
+ 3 127-33-00… 1-012-0 CT1     9.91e-1 0.00755 5.88e-4   79982 2013-02-18       0
+ 4 127-33-00… 1-011-5 CT2     2.37e-2 0.973   1.55e-3   76645 NA              NA
+ 5 127-33-01… 1-025-0 CT1     9.72e-1 0       7.60e-3   55934 2013-08-19      NA
+ 6 127-33-03… 1-013-0 CT2     1.34e-1 0.784   8.02e-2   62656 2013-09-03       0
+ 7 127-33-02… 1-011-5 CT1     5.57e-1 0.437   3.25e-3   74496 2013-08-23       0
+ 8 127-33-01… 1-024-0 CT3     2.77e-2 0.105   6.15e-1   57430 2013-09-17       0
+ 9 127-33-00… 1-012-5 CT4     1.39e-2 0.00886 1.87e-1   69615 2013-04-26       3
+10 127-33-02… 1-011-0 CT3     1.79e-3 0.457   5.34e-1   51453 2013-08-20       0
+# … with 1,395 more rows, 23 more variables: nugent_mobiluncus &lt;dbl&gt;,
+#   nugent_lactobacillus &lt;dbl&gt;, nugent_total_score &lt;dbl&gt;,
+#   nugent_interpretation &lt;chr&gt;, sti_mycoplasma_genitalium_pcr &lt;chr&gt;,
+#   sti_trichomonas_vaginalis_pcr &lt;chr&gt;, sti_neisseria_gonorrhoeae_pcr &lt;chr&gt;,
+#   sti_chlamydia_trachomatis_pcr &lt;chr&gt;, bloodcount_cd8_cellsperul &lt;dbl&gt;,
+#   bloodcount_cd8_percent &lt;dbl&gt;, bloodcount_cd4_cellsperul &lt;dbl&gt;,
+#   bloodcount_cd4_percent &lt;dbl&gt;, bloodcount_cd45_cellsperul &lt;dbl&gt;, …
+# ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+```
+]
+
+
+---
+
+## Example application of grouping: Counting
+
+And summarize:
+
+.tiny-font[
+
+
+```r
+fresh_metadata %&gt;%
+  group_by(amplicon_ct_assignment) %&gt;%
+  summarize(
+    n = n()  # n() returns the number of observations per group
+  )
+```
+
+```
+# A tibble: 4 × 2
+  amplicon_ct_assignment     n
+  &lt;chr&gt;                  &lt;int&gt;
+1 CT1                      170
+2 CT2                      452
+3 CT3                      392
+4 CT4                      391
+```
+]
+
+
+---
+
+## Example application of grouping: Counting
+
+Now let's group by multiple variables:
+
+.tiny-font[
+
+
+```r
+fresh_metadata %&gt;%
+  group_by(amplicon_ct_assignment, nugent_interpretation)
+```
+
+```
+# A tibble: 1,405 × 32
+# Groups:   amplicon_ct_assignment, nugent_interpretation [16]
+   study_id   visit…¹ ampli…² ampli…³ ampli…⁴ ampli…⁵ ampli…⁶ date_col…⁷ nugen…⁸
+   &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;date&gt;       &lt;dbl&gt;
+ 1 127-33-01… 1-024-5 CT2     2.92e-3 0.992   5.08e-4  141595 2013-09-20      NA
+ 2 127-33-01… 1-026-0 CT2     4.69e-4 0.998   8.38e-4   89485 2013-08-26      NA
+ 3 127-33-00… 1-012-0 CT1     9.91e-1 0.00755 5.88e-4   79982 2013-02-18       0
+ 4 127-33-00… 1-011-5 CT2     2.37e-2 0.973   1.55e-3   76645 NA              NA
+ 5 127-33-01… 1-025-0 CT1     9.72e-1 0       7.60e-3   55934 2013-08-19      NA
+ 6 127-33-03… 1-013-0 CT2     1.34e-1 0.784   8.02e-2   62656 2013-09-03       0
+ 7 127-33-02… 1-011-5 CT1     5.57e-1 0.437   3.25e-3   74496 2013-08-23       0
+ 8 127-33-01… 1-024-0 CT3     2.77e-2 0.105   6.15e-1   57430 2013-09-17       0
+ 9 127-33-00… 1-012-5 CT4     1.39e-2 0.00886 1.87e-1   69615 2013-04-26       3
+10 127-33-02… 1-011-0 CT3     1.79e-3 0.457   5.34e-1   51453 2013-08-20       0
+# … with 1,395 more rows, 23 more variables: nugent_mobiluncus &lt;dbl&gt;,
+#   nugent_lactobacillus &lt;dbl&gt;, nugent_total_score &lt;dbl&gt;,
+#   nugent_interpretation &lt;chr&gt;, sti_mycoplasma_genitalium_pcr &lt;chr&gt;,
+#   sti_trichomonas_vaginalis_pcr &lt;chr&gt;, sti_neisseria_gonorrhoeae_pcr &lt;chr&gt;,
+#   sti_chlamydia_trachomatis_pcr &lt;chr&gt;, bloodcount_cd8_cellsperul &lt;dbl&gt;,
+#   bloodcount_cd8_percent &lt;dbl&gt;, bloodcount_cd4_cellsperul &lt;dbl&gt;,
+#   bloodcount_cd4_percent &lt;dbl&gt;, bloodcount_cd45_cellsperul &lt;dbl&gt;, …
+# ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+```
+]
+
+---
+
+## Example application of grouping: Counting
+
+And summarize:
+
+.tiny-font[
+
+
+```r
+fresh_metadata %&gt;%
+  group_by(amplicon_ct_assignment, nugent_interpretation) %&gt;%
+  summarize(
+    n = n()  # n() returns the number of observations per group
+  )
+```
+
+```
+# A tibble: 16 × 3
+# Groups:   amplicon_ct_assignment [4]
+   amplicon_ct_assignment nugent_interpretation     n
+   &lt;chr&gt;                  &lt;chr&gt;                 &lt;int&gt;
+ 1 CT1                    BV                        1
+ 2 CT1                    INTERMEDIATE              5
+ 3 CT1                    NO BV                   117
+ 4 CT1                    &lt;NA&gt;                     47
+ 5 CT2                    BV                       17
+ 6 CT2                    INTERMEDIATE             50
+ 7 CT2                    NO BV                   266
+ 8 CT2                    &lt;NA&gt;                    119
+ 9 CT3                    BV                      177
+10 CT3                    INTERMEDIATE             78
+11 CT3                    NO BV                    53
+12 CT3                    &lt;NA&gt;                     84
+13 CT4                    BV                      195
+14 CT4                    INTERMEDIATE             59
+15 CT4                    NO BV                    33
+16 CT4                    &lt;NA&gt;                    104
+```
+
+]
+
+
+---
+
+## Performing multiple summaries at once
+
+--
+
+.tiny-font[
+
+
+```r
+fresh_metadata %&gt;%
+  group_by(amplicon_ct_assignment) %&gt;%
+  summarize(
+    n = n(),                                              # number of observations
+    mean_non_iners = mean(amplicon_pct_lacto_non_iners),  # mean non iners
+    max_cd4 = max(bloodcount_cd4_percent),                # max cd4 percent
+    percent_bv = sum(nugent_interpretation == "BV")/n()   # percent of BV
+  )
+```
+]
+
+--
+
+.tiny-font[
+
+
+```
+# A tibble: 4 × 5
+  amplicon_ct_assignment     n mean_non_iners max_cd4 percent_bv
+  &lt;chr&gt;                  &lt;int&gt;          &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;
+1 CT1                      170         0.841       NA         NA
+2 CT2                      452         0.0982      NA         NA
+3 CT3                      392         0.0289      NA         NA
+4 CT4                      391         0.0179      NA         NA
+```
+
+]
+
+--
+
+Each statement in `summarize()` creates one new column
+
+--
+
+But why all the `NA`s?
+
+---
+
+## Performing multiple summaries at once
+
+
+.tiny-font[
+
+
+```r
+fresh_metadata %&gt;%
+  group_by(amplicon_ct_assignment) %&gt;%
+  summarize(
+    n = n(),                                              # number of observations
+    mean_non_iners = mean(amplicon_pct_lacto_non_iners),  # mean non iners
+    max_cd4 = max(bloodcount_cd4_percent),                # max cd4 percent
+    percent_bv = sum(nugent_interpretation == "BV")/n()   # percent of BV
+  )
+```
+]
+
+
+.tiny-font[
+
+
+```
+# A tibble: 4 × 5
+  amplicon_ct_assignment     n mean_non_iners max_cd4 percent_bv
+  &lt;chr&gt;                  &lt;int&gt;          &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;
+1 CT1                      170         0.841       NA         NA
+2 CT2                      452         0.0982      NA         NA
+3 CT3                      392         0.0289      NA         NA
+4 CT4                      391         0.0179      NA         NA
+```
+
+]
+We typically need to tell R how exactly `NA`s should be handled. More on this in a moment.
+
+[//]: # "segment ends here"
+
+
+---
+class: center middle
+
+## Reshaping: Making tables wider or longer
+
+---
+
+## Reshape: `pivot_wider()` and `pivot_longer()`
+
+&lt;br&gt;
+
+.center[
+&lt;img src = "data-wrangling-2_files/pivot.svg", width = 50%&gt;&lt;/img&gt;
+]
+
+
+---
+
+## Reshaping example: Making a wide summary table
+
+
+.tiny-font[
+
+
+```r
+fresh_metadata %&gt;%
+  group_by(amplicon_ct_assignment, nugent_interpretation) %&gt;%
+  summarize(
+    n = n()  # n() returns the number of observations per group
+  )
+```
+
+```
+# A tibble: 16 × 3
+# Groups:   amplicon_ct_assignment [4]
+   amplicon_ct_assignment nugent_interpretation     n
+   &lt;chr&gt;                  &lt;chr&gt;                 &lt;int&gt;
+ 1 CT1                    BV                        1
+ 2 CT1                    INTERMEDIATE              5
+ 3 CT1                    NO BV                   117
+ 4 CT1                    &lt;NA&gt;                     47
+ 5 CT2                    BV                       17
+ 6 CT2                    INTERMEDIATE             50
+ 7 CT2                    NO BV                   266
+ 8 CT2                    &lt;NA&gt;                    119
+ 9 CT3                    BV                      177
+10 CT3                    INTERMEDIATE             78
+11 CT3                    NO BV                    53
+12 CT3                    &lt;NA&gt;                     84
+13 CT4                    BV                      195
+14 CT4                    INTERMEDIATE             59
+15 CT4                    NO BV                    33
+16 CT4                    &lt;NA&gt;                    104
+```
+]
+
+
+---
+
+## Reshaping example: Making a wide summary table
+
+.tiny-font[
+
+
+
+```r
+fresh_metadata %&gt;%
+  group_by(amplicon_ct_assignment, nugent_interpretation) %&gt;%
+  summarize(
+    n = n()  # n() returns the number of observations per group
+  ) %&gt;%
+  pivot_wider(names_from = "amplicon_ct_assignment", values_from = "n")
+```
+
+```
+# A tibble: 4 × 5
+  nugent_interpretation   CT1   CT2   CT3   CT4
+  &lt;chr&gt;                 &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+1 BV                        1    17   177   195
+2 INTERMEDIATE              5    50    78    59
+3 NO BV                   117   266    53    33
+4 &lt;NA&gt;                     47   119    84   104
+```
+]
+---
+
+
+## And going back to long format
+
+.tiny-font[
+
+
+```r
+nugent_summary_wide &lt;- fresh_metadata %&gt;%
+  group_by(amplicon_ct_assignment, nugent_interpretation) %&gt;%
+  summarize(
+    n = n()  # n() returns the number of observations per group
+  ) %&gt;%
+  pivot_wider(names_from = "amplicon_ct_assignment", values_from = "n")
+
+nugent_summary_wide %&gt;% 
+  pivot_longer(cols = -nugent_interpretation, names_to = "ct", values_to = "n")
+```
+
+```
+# A tibble: 16 × 3
+   nugent_interpretation ct        n
+   &lt;chr&gt;                 &lt;chr&gt; &lt;int&gt;
+ 1 BV                    CT1       1
+ 2 BV                    CT2      17
+ 3 BV                    CT3     177
+ 4 BV                    CT4     195
+ 5 INTERMEDIATE          CT1       5
+ 6 INTERMEDIATE          CT2      50
+ 7 INTERMEDIATE          CT3      78
+ 8 INTERMEDIATE          CT4      59
+ 9 NO BV                 CT1     117
+10 NO BV                 CT2     266
+11 NO BV                 CT3      53
+12 NO BV                 CT4      33
+13 &lt;NA&gt;                  CT1      47
+14 &lt;NA&gt;                  CT2     119
+15 &lt;NA&gt;                  CT3      84
+16 &lt;NA&gt;                  CT4     104
+```
+]
+
+
+---
+
+## And going back to long format
+
+Column specifications work just like in `select()`:
+
+.tiny-font[
+
+
+```r
+# specify columns by subtraction
+nugent_summary_wide %&gt;% 
+  pivot_longer(cols = -nugent_interpretation, names_to = "ct", values_to = "n")
+```
+
+```
+# A tibble: 16 × 3
+   nugent_interpretation ct        n
+   &lt;chr&gt;                 &lt;chr&gt; &lt;int&gt;
+ 1 BV                    CT1       1
+ 2 BV                    CT2      17
+ 3 BV                    CT3     177
+ 4 BV                    CT4     195
+ 5 INTERMEDIATE          CT1       5
+ 6 INTERMEDIATE          CT2      50
+ 7 INTERMEDIATE          CT3      78
+ 8 INTERMEDIATE          CT4      59
+ 9 NO BV                 CT1     117
+10 NO BV                 CT2     266
+11 NO BV                 CT3      53
+12 NO BV                 CT4      33
+13 &lt;NA&gt;                  CT1      47
+14 &lt;NA&gt;                  CT2     119
+15 &lt;NA&gt;                  CT3      84
+16 &lt;NA&gt;                  CT4     104
+```
+]
+
+
+
+## And going back to long format
+
+Column specifications work just like in `select()`:
+
+.tiny-font[
+
+
+```r
+# specify columns by explicit listing
+nugent_summary_wide %&gt;% 
+  pivot_longer(cols = c(CT1, CT2, CT3, CT4), names_to = "ct", values_to = "n")
+```
+
+```
+# A tibble: 16 × 3
+   nugent_interpretation ct        n
+   &lt;chr&gt;                 &lt;chr&gt; &lt;int&gt;
+ 1 BV                    CT1       1
+ 2 BV                    CT2      17
+ 3 BV                    CT3     177
+ 4 BV                    CT4     195
+ 5 INTERMEDIATE          CT1       5
+ 6 INTERMEDIATE          CT2      50
+ 7 INTERMEDIATE          CT3      78
+ 8 INTERMEDIATE          CT4      59
+ 9 NO BV                 CT1     117
+10 NO BV                 CT2     266
+11 NO BV                 CT3      53
+12 NO BV                 CT4      33
+13 &lt;NA&gt;                  CT1      47
+14 &lt;NA&gt;                  CT2     119
+15 &lt;NA&gt;                  CT3      84
+16 &lt;NA&gt;                  CT4     104
+```
+
+]
+---
+
+
+## Plots map data onto graphical elements
+
+---
+
+## Dataset:&lt;br&gt;Daily average temperatures for various locations
+
+.small-font[.center[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; location &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; day_of_year &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; month &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; temperature &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 51.0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 51.2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 51.3 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 51.4 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 51.6 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 51.7 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 51.9 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 52.0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 52.2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 52.3 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 52.5 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 52.7 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 52.9 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 53.0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Death Valley &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 53.2 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]]
+
+---
+
+## Temperatures mapped onto y position
+
+.center[
+![](crash_course_files/figure-html/temp-normals-vs-time-1.svg)&lt;!-- --&gt;
+]
+
+???
+
+Figure redrawn from [Claus O. Wilke. Fundamentals of Data Visualization. O'Reilly, 2019.](https://clauswilke.com/dataviz)
+
+---
+
+## Temperatures mapped onto color
+
+&lt;br&gt;
+
+.center[
+![](crash_course_files/figure-html/four-locations-temps-by-month-1.svg)&lt;!-- --&gt;
+]
+
+???
+
+Figure redrawn from [Claus O. Wilke. Fundamentals of Data Visualization. O'Reilly, 2019.](https://clauswilke.com/dataviz)
+
+---
+
+## Commonly used aesthetics
+
+.center[
+&lt;img src = "https://clauswilke.com/dataviz/aesthetic_mapping_files/figure-html/common-aesthetics-1.png", width = 90%&gt;&lt;/img&gt;
+]
+
+???
+
+Figure from [Claus O. Wilke. Fundamentals of Data Visualization. O'Reilly, 2019.](https://clauswilke.com/dataviz)
+
+
+---
+
+## The same data values can be mapped to different aesthetics
+
+.center[
+&lt;img src = "https://clauswilke.com/dataviz/aesthetic_mapping_files/figure-html/basic-scales-example-1.png", width = 90%&gt;&lt;/img&gt;
+]
+
+???
+
+Figure from [Claus O. Wilke. Fundamentals of Data Visualization. O'Reilly, 2019.](https://clauswilke.com/dataviz)
+
+---
+
+## We can use many different aesthetics at once
+
+&lt;br&gt;
+
+.center.move-up-1em[
+![](crash_course_files/figure-html/mtcars-five-scale-1.svg)&lt;!-- --&gt;
+]
+
+???
+
+Figure from [Claus O. Wilke. Fundamentals of Data Visualization. O'Reilly, 2019.](https://clauswilke.com/dataviz)
+
+[//]: # "segment ends here"
+
+---
+class: center middle
+
+
+## Creating aesthetic mappings in ggplot
+
+---
+
+## We define the mapping with `aes()`
+
+
+
+.small-font[
+
+```r
+ggplot(
+  data = temperatures,
+  mapping = aes(x = day_of_year, y = temperature, color = location)
+) + geom_line()
+```
+]
+
+.center[
+![](crash_course_files/figure-html/ggplot-temps-example-out-1.svg)&lt;!-- --&gt;
+]
+
+
+---
+
+## We define the mapping with `aes()`
+
+.small-font[
+
+```r
+ggplot(
+  data = temperatures,
+  mapping = aes(x = day_of_year, y = location, color = temperature)
+) + geom_point(size = 5)
+```
+]
+
+.center[
+![](crash_course_files/figure-html/ggplot-temps-example2-out-1.svg)&lt;!-- --&gt;
+]
+
+
+
+---
+
+## The geom determines how the data is shown
+
+.small-font[
+
+```r
+ggplot(temperatures, aes(day_of_year, temperature, color = location)) + 
+  geom_line()
+```
+]
+
+.center[
+![](crash_course_files/figure-html/ggplot-temps-example5-out-1.svg)&lt;!-- --&gt;
+]
+
+
+---
+
+## The geom determines how the data is shown
+
+.small-font[
+
+```r
+ggplot(temperatures, aes(day_of_year, location, color = temperature)) +
+  geom_point(size = 5)
+```
+]
+
+.center[
+![](crash_course_files/figure-html/ggplot-temps-example6-out-1.svg)&lt;!-- --&gt;
+]
+
+---
+
+## The geom determines how the data is shown
+
+.small-font[
+
+```r
+ggplot(temperatures, aes(month, temperature, color = location)) + 
+  geom_boxplot()
+```
+]
+
+
+.center[
+![](crash_course_files/figure-html/ggplot-temps-example7-out-1.svg)&lt;!-- --&gt;
+]
+
+---
+
+## The geom determines how the data is shown
+
+.small-font[
+
+```r
+ggplot(temperatures, aes(month, temperature, fill = location)) + 
+  geom_violin() + 
+  facet_wrap(vars(location)) # make separate panel per location
+```
+]
+
+
+.center[
+![](crash_course_files/figure-html/ggplot-temps-example8-out-1.svg)&lt;!-- --&gt;
+]
+
+[//]: # "segment ends here"
+
+---
+
+# Challenge plots
+
+.left[
+![](crash_course_files/figure-html/unnamed-chunk-16-1.svg)&lt;!-- --&gt;
+]
+.right[
+
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"slideNumberFormat": ""
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
