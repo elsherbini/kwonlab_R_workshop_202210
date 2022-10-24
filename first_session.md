@@ -1,4 +1,4 @@
-*This is the first session's notes. If you want the second session, go back to [https://github.com/elsherbini/kwonlab_R_workshop_20221017]*
+*This is the first session's notes. If you want the second session, go back to [https://github.com/elsherbini/kwonlab_R_workshop_202210]*
 
 ## Intro to R and R studio
 
